@@ -1,0 +1,29 @@
+{
+  "name": "process-receipt-service",
+  "version": "1.0.0",
+  "description": "AWS Lambda service for processing receipt images",
+  "main": "src/processReceipt.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "serverless deploy",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f processReceipt -t"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.400.0",
+    "@aws-sdk/client-s3": "^3.400.0",
+    "@aws-sdk/client-secrets-manager": "^3.400.0",
+    "@google-cloud/firestore": "^7.0.0",
+    "@google-cloud/vision": "^4.0.0",
+    "zod": "^3.25.57"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/node": "^20.0.0",
+    "serverless": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

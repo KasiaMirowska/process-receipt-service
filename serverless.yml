@@ -1,0 +1,65 @@
+service: process-receipt-service
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  architecture: x86_64
+  region: us-east-1
+  environment:
+    S3_BUCKET: km-expense-tracker-receipts
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetSecretValue
+      Resource:
+        - arn:aws:secretsmanager:us-east-1:393456671484:secret:firestore-key-wO11uz
+        - arn:aws:secretsmanager:us-east-1:393456671484:secret:gcp/service-account-key-Rj12L0
+    - Effect: Allow
+      Action:
+        - logs:*
+        - s3:GetObject
+        - s3:ListBucket
+        - bedrock:InvokeModel
+      Resource: "*"
+
+logs:
+  lambda:
+    retentionInDays: 7
+
+functions:
+  processReceipt:
+    handler: src/processReceipt.handler
+    timeout: 30
+    memorySize: 512
+    events:
+      - s3:
+          bucket: km-expense-tracker-receipts
+          event: s3:ObjectCreated:*
+          existing: true
+          rules:
+            - prefix: uploads/
+            - suffix: .png
+
+build:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    target: node18
+    platform: node
+    format: cjs
+    mainFields: ["main", "module"]
+    external:
+      - "@google-cloud/vision"
+      - "@google-cloud/firestore"
+      - "google-gax"
+      - "@grpc/grpc-js"
+      - "@grpc/proto-loader"
+      - "grpc"
+      - "protobufjs"
+    keepNames: true
+    exclude:
+      - "aws-sdk"
+
+package:
+  individually: truexz

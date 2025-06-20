@@ -1,0 +1,9 @@
+{
+  "name": "gcp-libs",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@google-cloud/firestore": "^7.11.1",
+    "@google-cloud/vision": "^5.2.0"
+  }
+}
