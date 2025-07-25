@@ -112,23 +112,162 @@ __name(bufferFromStream, "bufferFromStream");
 
 // utils/parseReceiptText.ts
 var import_client_bedrock_runtime = require("@aws-sdk/client-bedrock-runtime");
+
+// utils/textParser.ts
+function parseRawText(rawText) {
+  try {
+    const lines = rawText.split("\n").map((line) => line.trim()).filter(Boolean);
+    console.log("\u{1F4AC} Raw lines to be parsed:", lines);
+    const merchantIndex = lines.findIndex(
+      (line) => /target|walmart|costco|whole\s?foods|aldi|trader joe's/i.test(line)
+    );
+    const merchant = merchantIndex !== -1 ? lines[merchantIndex] : "Unknown";
+    const dateRegex = /\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.](\d{2,4}))\b/;
+    const dateIndex = lines.findIndex((line) => dateRegex.test(line));
+    const dateMatch = dateIndex !== -1 ? lines[dateIndex].match(dateRegex) : null;
+    const date = dateMatch?.[0] || (/* @__PURE__ */ new Date()).toISOString();
+    let address = "";
+    if (merchantIndex !== -1 && dateIndex !== -1 && merchantIndex < dateIndex) {
+      const addressLines = lines.slice(merchantIndex + 1, dateIndex).filter(
+        (line) => !dateRegex.test(line) && !/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}$/.test(line)
+      );
+      address = addressLines.join(", ");
+    }
+    const totalKeywords = ["total", "amount due", "balance due"];
+    let total = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].toLowerCase();
+      if (totalKeywords.some((keyword) => line.includes(keyword))) {
+        const currentMatch = lines[i].match(/\d+[\.,]?\d{0,2}/);
+        const nextMatch = lines[i + 1]?.match(/\d+[\.,]?\d{0,2}/);
+        if (currentMatch) {
+          total = parseFloat(currentMatch[0].replace(",", "."));
+          break;
+        } else if (nextMatch) {
+          total = parseFloat(nextMatch[0].replace(",", "."));
+          break;
+        }
+      }
+    }
+    let tax = 0;
+    for (let i = 0; i < lines.length; i++) {
+      if (/tax/i.test(lines[i])) {
+        const currentMatch = lines[i].match(/\d+[\.,]?\d{0,2}/);
+        const nextMatch = lines[i + 1]?.match(/\d+[\.,]?\d{0,2}/);
+        if (currentMatch) {
+          tax = parseFloat(currentMatch[0].replace(",", "."));
+          break;
+        } else if (nextMatch) {
+          tax = parseFloat(nextMatch[0].replace(",", "."));
+          break;
+        }
+      }
+    }
+    const priceRegex = /\$?\d+[\.,]?\d{0,2}/;
+    const skipKeywords = /total|tax|change|subtotal/i;
+    const linesAfterDate = dateIndex !== -1 ? lines.slice(dateIndex + 1) : lines;
+    const items = [];
+    let skipNextLine = false;
+    for (const line of linesAfterDate) {
+      const lowerLine = line.toLowerCase();
+      if (skipNextLine) {
+        skipNextLine = false;
+        continue;
+      }
+      if (skipKeywords.test(lowerLine)) {
+        skipNextLine = true;
+        continue;
+      }
+      if (priceRegex.test(line) && !/^\d{3,}$/.test(line.trim()) && // skip zip codes like 02111
+      !/\d{5}(-\d{4})?/.test(line)) {
+        const priceMatch = line.match(priceRegex);
+        if (priceMatch) {
+          const match = priceMatch[0];
+          const price = parseFloat(match.replace("$", "").replace(",", "."));
+          const name = line.replace(priceRegex, "").trim();
+          items.push({
+            name: name || "Unnamed Item",
+            price,
+            quantity: 1
+          });
+        }
+      }
+    }
+    const groceryKeywords = [
+      "market",
+      "grocery",
+      "food",
+      "store",
+      "target",
+      "walmart",
+      "costco"
+    ];
+    const category = groceryKeywords.some(
+      (word) => rawText.toLowerCase().includes(word)
+    ) ? "groceries" : "Uncategorized";
+    const result = {
+      merchant,
+      address,
+      date,
+      total,
+      items,
+      tax,
+      category
+    };
+    console.log("\u{1F9FE} Final parsed result:", result);
+    return result;
+  } catch (err) {
+    return {
+      merchant: "Unknown",
+      address: "",
+      date: (/* @__PURE__ */ new Date()).toISOString(),
+      total: 0,
+      items: [],
+      tax: 0,
+      category: "Uncategorized",
+      rawText,
+      parseError: err.message || "Unknown parsing error"
+    };
+  }
+}
+__name(parseRawText, "parseRawText");
+
+// utils/parseReceiptText.ts
 var bedrock = new import_client_bedrock_runtime.BedrockRuntimeClient({ region: "us-east-1" });
 async function parseReceiptText(fullText, key) {
   try {
     console.log("Parsing receipt text with AWS Bedrock...");
     const prompt = `
-Parse this receipt text and extract the following information in JSON format:
-- merchant: string (store name)
-- date: string (transaction date in YYYY-MM-DD format)
-- total: number (total amount)
-- items: array of objects with {name: string, price: number, quantity: number}
-- tax: number (tax amount if available)
-- category: string (infer category like "groceries", "restaurant", "gas", etc.)
+You are a receipt-parsing assistant.
 
-Receipt text:
+Your task is to extract structured data from unstructured receipt text.
+
+Return a **valid JSON object** matching this schema:
+{
+  "merchant": string, // e.g. "Target", "Walmart", "Chipotle"
+  "address": string,  // if available, full street address
+  "date": string,     // format: YYYY-MM-DD
+  "total": number,    // final total paid
+  "tax": number,      // if present
+  "items": [ { "name": string, "price": number, "quantity": number } ],
+  "category": string  // one of: groceries, restaurant, gas, clothing, household, electronics, other
+}
+
+### Instructions:
+- The **merchant** is usually in the header \u2014 the first branded line (e.g., "Target", "Trader Joe's", "Shell").
+  - If unclear, guess based on context.
+  - Do NOT return "Unknown" \u2014 return the most likely name.
+- Try to extract **address** if it follows the merchant line or is a street format.
+- Ensure all numeric fields are numbers (not strings).
+- If **items** are present, extract their names, prices, and quantity if visible.
+- Guess a **category** based on items or merchant type.
+
+### Receipt Text:
+\`\`\`
 ${fullText}
+\`\`\`
 
-Return only valid JSON, no additional text.
+Return only the JSON object. No explanation or extra text.
 `;
     const command = new import_client_bedrock_runtime.InvokeModelCommand({
       modelId: "anthropic.claude-3-haiku-20240307-v1:0",
@@ -153,23 +292,19 @@ Return only valid JSON, no additional text.
     );
     const content = responseBody.content[0].text;
     const parsed = JSON.parse(content);
+    console.log("PPPPPPP", parsed.merchant, parsed);
     if (!parsed.merchant || typeof parsed.total !== "number") {
       throw new Error("Invalid parsed receipt data structure");
+    }
+    const firstLine = fullText.split("\n")[0];
+    if (parsed.merchant === "Unknown" && /[A-Za-z]{3,}/.test(firstLine)) {
+      parsed.merchant = firstLine.trim();
     }
     console.log("Successfully parsed receipt:", parsed);
     return parsed;
   } catch (error) {
     console.error("Error parsing receipt text:", error);
-    const fallback = {
-      merchant: "Unknown",
-      date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-      total: 0,
-      items: [],
-      tax: 0,
-      category: "unknown",
-      rawText: fullText,
-      parseError: error.message
-    };
+    const fallback = parseRawText(fullText);
     return fallback;
   }
 }
@@ -178,59 +313,71 @@ __name(parseReceiptText, "parseReceiptText");
 // src/processReceipt.ts
 var s3 = new import_client_s3.S3Client({ region: "us-east-1" });
 var handler = /* @__PURE__ */ __name(async (event) => {
-  console.log("Lambda started, initializing services...");
   try {
+    const record = event.Records[0];
+    const key = decodeURIComponent(record.s3.object.key.replace(/\+/g, " "));
+    const bucket = record.s3.bucket.name;
+    console.log(`\u{1F514} Lambda triggered by: ${key}`);
+    if (!key.endsWith("manifest.json")) {
+      console.log("\u274C Not a manifest file. Skipping...");
+      return { statusCode: 200, body: "Not a manifest file. Ignored." };
+    }
+    const manifestResponse = await s3.send(
+      new import_client_s3.GetObjectCommand({ Bucket: bucket, Key: key })
+    );
+    if (!manifestResponse.Body || !(manifestResponse.Body instanceof import_stream.Readable)) {
+      throw new Error("Failed to read manifest file stream");
+    }
+    const manifestBuffer = await bufferFromStream(manifestResponse.Body);
+    const manifestText = manifestBuffer.toString("utf-8");
+    const manifest = JSON.parse(manifestText);
+    const { receiptId, imageKeys } = manifest;
+    console.log(`\u{1F4E6} Manifest for receiptId: ${receiptId}`);
+    console.log(`\u{1F5BC}\uFE0F Images to process:`, imageKeys);
     const firestore = await initializeFirestore();
     const visionClient = await initializeGCPvision();
-    console.log("Firestore and Vision clients initialized successfully");
-    for (const record of event.Records) {
-      const bucket = record.s3.bucket.name;
-      const key = decodeURIComponent(record.s3.object.key.replace(/\+/g, " "));
-      console.log(`Processing file: ${key} from bucket: ${bucket}`);
-      const cmd = new import_client_s3.GetObjectCommand({ Bucket: bucket, Key: key });
+    let combinedText = "";
+    for (const imageKey of imageKeys) {
+      const cmd = new import_client_s3.GetObjectCommand({ Bucket: bucket, Key: imageKey });
       const response = await s3.send(cmd);
       if (!response.Body || !(response.Body instanceof import_stream.Readable)) {
-        console.error("Missing or invalid response.Body for key:", key);
+        console.warn(`\u26A0\uFE0F Skipping invalid image file: ${imageKey}`);
         continue;
       }
-      console.log("Retrieved object from S3");
       const imageBuffer = await bufferFromStream(response.Body);
-      console.log("Calling Vision API for text detection...");
       const [visionResult] = await visionClient.textDetection({
         image: { content: imageBuffer }
       });
-      console.log("Vision API response received");
-      const fullText = visionResult.fullTextAnnotation?.text;
-      if (!fullText?.trim()) {
-        console.warn(`No OCR text found for ${key}`);
-        continue;
-      }
-      try {
-        console.log("Parsing receipt text...");
-        const parsed = await parseReceiptText(fullText, key);
-        const receiptId = key.split("/")[1]?.split("_")[0];
-        await firestore.collection("receiptTransactions").doc(receiptId).set({
-          ...parsed,
-          imageUrl: `https://${bucket}.s3.amazonaws.com/${key}`,
-          createdAt: (/* @__PURE__ */ new Date()).toISOString(),
-          receiptId
-        });
-        console.log("\u2705 Receipt parsed and stored with ID:", receiptId, parsed);
-      } catch (err) {
-        console.error("\u274C Failed to parse or store receipt:", err);
-        console.error("Error details:", err.stack);
-      }
+      const text = visionResult.fullTextAnnotation?.text ?? "";
+      console.log(`\u2705 OCR text from ${imageKey} length:`, text.length);
+      combinedText += `
+${text}`;
     }
+    if (!combinedText.trim()) {
+      throw new Error("\u274C No OCR text extracted from any image.");
+    }
+    const parsed = await parseReceiptText(combinedText, receiptId);
+    await firestore.collection("receiptTransactions").doc(receiptId).set({
+      ...parsed,
+      receiptId,
+      createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+      imageUrls: imageKeys.map(
+        (key2) => `https://${bucket}.s3.amazonaws.com/${key2}`
+      )
+    });
+    console.log("\u{1F389} Receipt parsed and saved:", receiptId);
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Processing completed" })
+      body: JSON.stringify({ message: "Receipt processed", receiptId })
     };
   } catch (error) {
-    console.error("\u274C Lambda execution error:", error);
-    console.error("Error stack:", error.stack);
+    console.error("\u274C Error processing manifest-based receipt:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" })
+      body: JSON.stringify({
+        error: "Failed to process receipt",
+        detail: error.message
+      })
     };
   }
 }, "handler");

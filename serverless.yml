@@ -34,11 +34,10 @@ functions:
     events:
       - s3:
           bucket: km-expense-tracker-receipts
-          event: s3:ObjectCreated:*
+          event: s3:ObjectCreated:Put
           existing: true
           rules:
             - prefix: uploads/
-            - suffix: .png
 
 build:
   esbuild:

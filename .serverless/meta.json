@@ -1,6 +1,6 @@
 {
   "/Users/kasiamirowska/PROJECTS/process-receipt-service/serverless.yml": {
-    "versionFramework": "4.17.0",
+    "versionFramework": "4.17.2",
     "servicePath": "/Users/kasiamirowska/PROJECTS/process-receipt-service/serverless.yml",
     "serviceConfigFileName": "serverless.yml",
     "service": {
@@ -150,7 +150,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-                  "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/process-receipt-service-processReceipt.zip"
+                  "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/process-receipt-service-processReceipt.zip"
                 },
                 "Handler": "src/processReceipt.handler",
                 "Runtime": "nodejs18.x",
@@ -177,14 +177,14 @@
                 "ProcessReceiptLogGroup"
               ]
             },
-            "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY": {
+            "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ProcessReceiptLambdaFunction"
                 },
-                "CodeSha256": "RlyO24CbCUM1r9+sWGHfmC+2mkslwX+l4RmheqCJnRU="
+                "CodeSha256": "CdJI6bTZFJrw3hsbnct2T10DAjeQxz15qZW11a5qr9k="
               }
             },
             "ProcessReceiptCustomS31": {
@@ -200,13 +200,10 @@
                 "BucketName": "km-expense-tracker-receipts",
                 "BucketConfigs": [
                   {
-                    "Event": "s3:ObjectCreated:*",
+                    "Event": "s3:ObjectCreated:Put",
                     "Rules": [
                       {
                         "Prefix": "uploads/"
-                      },
-                      {
-                        "Suffix": ".png"
                       }
                     ]
                   }
@@ -331,7 +328,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-                  "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/custom-resources.zip"
+                  "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/custom-resources.zip"
                 },
                 "FunctionName": "process-receipt-service-dev-custom-resource-existing-s3",
                 "Handler": "s3/handler.handler",
@@ -367,7 +364,7 @@
             "ProcessReceiptLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY"
+                "Ref": "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog"
               },
               "Export": {
                 "Name": "sls-process-receipt-service-dev-ProcessReceiptLambdaFunctionQualifiedArn"
@@ -391,14 +388,11 @@
             {
               "s3": {
                 "bucket": "km-expense-tracker-receipts",
-                "event": "s3:ObjectCreated:*",
+                "event": "s3:ObjectCreated:Put",
                 "existing": true,
                 "rules": [
                   {
                     "prefix": "uploads/"
-                  },
-                  {
-                    "suffix": ".png"
                   }
                 ]
               }
@@ -414,7 +408,7 @@
           "memory": 512,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY"
+          "versionLogicalId": "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog"
         }
       },
       "build": {
@@ -448,7 +442,7 @@
         "individually": "truexz",
         "artifactsS3KeyDirname": "serverless/process-receipt-service/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-        "artifactDirectoryName": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z"
+        "artifactDirectoryName": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z"
       }
     },
     "provider": {
@@ -596,7 +590,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-                "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/process-receipt-service-processReceipt.zip"
+                "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/process-receipt-service-processReceipt.zip"
               },
               "Handler": "src/processReceipt.handler",
               "Runtime": "nodejs18.x",
@@ -623,14 +617,14 @@
               "ProcessReceiptLogGroup"
             ]
           },
-          "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY": {
+          "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ProcessReceiptLambdaFunction"
               },
-              "CodeSha256": "RlyO24CbCUM1r9+sWGHfmC+2mkslwX+l4RmheqCJnRU="
+              "CodeSha256": "CdJI6bTZFJrw3hsbnct2T10DAjeQxz15qZW11a5qr9k="
             }
           },
           "ProcessReceiptCustomS31": {
@@ -646,13 +640,10 @@
               "BucketName": "km-expense-tracker-receipts",
               "BucketConfigs": [
                 {
-                  "Event": "s3:ObjectCreated:*",
+                  "Event": "s3:ObjectCreated:Put",
                   "Rules": [
                     {
                       "Prefix": "uploads/"
-                    },
-                    {
-                      "Suffix": ".png"
                     }
                   ]
                 }
@@ -777,7 +768,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-                "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/custom-resources.zip"
+                "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/custom-resources.zip"
               },
               "FunctionName": "process-receipt-service-dev-custom-resource-existing-s3",
               "Handler": "s3/handler.handler",
@@ -813,7 +804,7 @@
           "ProcessReceiptLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY"
+              "Ref": "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog"
             },
             "Export": {
               "Name": "sls-process-receipt-service-dev-ProcessReceiptLambdaFunctionQualifiedArn"
@@ -832,7 +823,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: process-receipt-service\n\nprovider:\n  name: aws\n  runtime: nodejs18.x\n  architecture: x86_64\n  region: us-east-1\n  environment:\n    S3_BUCKET: km-expense-tracker-receipts\n  iamRoleStatements:\n    - Effect: Allow\n      Action:\n        - secretsmanager:GetSecretValue\n      Resource:\n        - arn:aws:secretsmanager:us-east-1:393456671484:secret:firestore-key-wO11uz\n        - arn:aws:secretsmanager:us-east-1:393456671484:secret:gcp/service-account-key-Rj12L0\n    - Effect: Allow\n      Action:\n        - logs:*\n        - s3:GetObject\n        - s3:ListBucket\n        - bedrock:InvokeModel\n      Resource: \"*\"\n\nlogs:\n  lambda:\n    retentionInDays: 7\n\nfunctions:\n  processReceipt:\n    handler: src/processReceipt.handler\n    timeout: 30\n    memorySize: 512\n    events:\n      - s3:\n          bucket: km-expense-tracker-receipts\n          event: s3:ObjectCreated:*\n          existing: true\n          rules:\n            - prefix: uploads/\n            - suffix: .png\n\nbuild:\n  esbuild:\n    bundle: true\n    minify: false\n    sourcemap: true\n    target: node18\n    platform: node\n    format: cjs\n    mainFields: [\"main\", \"module\"]\n    external:\n      - \"@google-cloud/vision\"\n      - \"@google-cloud/firestore\"\n      - \"google-gax\"\n      - \"@grpc/grpc-js\"\n      - \"@grpc/proto-loader\"\n      - \"grpc\"\n      - \"protobufjs\"\n    keepNames: true\n    exclude:\n      - \"aws-sdk\"\n\npackage:\n  individually: truexz\n",
+    "serviceRawFile": "service: process-receipt-service\n\nprovider:\n  name: aws\n  runtime: nodejs18.x\n  architecture: x86_64\n  region: us-east-1\n  environment:\n    S3_BUCKET: km-expense-tracker-receipts\n  iamRoleStatements:\n    - Effect: Allow\n      Action:\n        - secretsmanager:GetSecretValue\n      Resource:\n        - arn:aws:secretsmanager:us-east-1:393456671484:secret:firestore-key-wO11uz\n        - arn:aws:secretsmanager:us-east-1:393456671484:secret:gcp/service-account-key-Rj12L0\n    - Effect: Allow\n      Action:\n        - logs:*\n        - s3:GetObject\n        - s3:ListBucket\n        - bedrock:InvokeModel\n      Resource: \"*\"\n\nlogs:\n  lambda:\n    retentionInDays: 7\n\nfunctions:\n  processReceipt:\n    handler: src/processReceipt.handler\n    timeout: 30\n    memorySize: 512\n    events:\n      - s3:\n          bucket: km-expense-tracker-receipts\n          event: s3:ObjectCreated:Put\n          existing: true\n          rules:\n            - prefix: uploads/\n\nbuild:\n  esbuild:\n    bundle: true\n    minify: false\n    sourcemap: true\n    target: node18\n    platform: node\n    format: cjs\n    mainFields: [\"main\", \"module\"]\n    external:\n      - \"@google-cloud/vision\"\n      - \"@google-cloud/firestore\"\n      - \"google-gax\"\n      - \"@grpc/grpc-js\"\n      - \"@grpc/proto-loader\"\n      - \"grpc\"\n      - \"protobufjs\"\n    keepNames: true\n    exclude:\n      - \"aws-sdk\"\n\npackage:\n  individually: truexz\n",
     "command": [
       "deploy"
     ],
@@ -845,12 +836,12 @@
     "serviceProviderAwsCfStackName": "process-receipt-service-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:393456671484:stack/process-receipt-service-dev/c17e62c0-4632-11f0-94b4-0e42d26d685d",
     "serviceProviderAwsCfStackCreated": "2025-06-10T19:40:25.869Z",
-    "serviceProviderAwsCfStackUpdated": "2025-06-10T20:56:26.310Z",
+    "serviceProviderAwsCfStackUpdated": "2025-07-25T02:50:17.745Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ProcessReceiptLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:393456671484:function:process-receipt-service-dev-processReceipt:28",
+        "OutputValue": "arn:aws:lambda:us-east-1:393456671484:function:process-receipt-service-dev-processReceipt:43",
         "Description": "Current Lambda function version",
         "ExportName": "sls-process-receipt-service-dev-ProcessReceiptLambdaFunctionQualifiedArn"
       },
@@ -973,7 +964,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-              "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/process-receipt-service-processReceipt.zip"
+              "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/process-receipt-service-processReceipt.zip"
             },
             "Handler": "src/processReceipt.handler",
             "Runtime": "nodejs18.x",
@@ -1000,14 +991,14 @@
             "ProcessReceiptLogGroup"
           ]
         },
-        "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY": {
+        "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ProcessReceiptLambdaFunction"
             },
-            "CodeSha256": "RlyO24CbCUM1r9+sWGHfmC+2mkslwX+l4RmheqCJnRU="
+            "CodeSha256": "CdJI6bTZFJrw3hsbnct2T10DAjeQxz15qZW11a5qr9k="
           }
         },
         "ProcessReceiptCustomS31": {
@@ -1023,13 +1014,10 @@
             "BucketName": "km-expense-tracker-receipts",
             "BucketConfigs": [
               {
-                "Event": "s3:ObjectCreated:*",
+                "Event": "s3:ObjectCreated:Put",
                 "Rules": [
                   {
                     "Prefix": "uploads/"
-                  },
-                  {
-                    "Suffix": ".png"
                   }
                 ]
               }
@@ -1154,7 +1142,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-              "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/custom-resources.zip"
+              "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/custom-resources.zip"
             },
             "FunctionName": "process-receipt-service-dev-custom-resource-existing-s3",
             "Handler": "s3/handler.handler",
@@ -1190,7 +1178,7 @@
         "ProcessReceiptLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY"
+            "Ref": "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog"
           },
           "Export": {
             "Name": "sls-process-receipt-service-dev-ProcessReceiptLambdaFunctionQualifiedArn"

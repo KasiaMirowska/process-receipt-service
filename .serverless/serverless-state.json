@@ -135,7 +135,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-                "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/process-receipt-service-processReceipt.zip"
+                "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/process-receipt-service-processReceipt.zip"
               },
               "Handler": "src/processReceipt.handler",
               "Runtime": "nodejs18.x",
@@ -162,14 +162,14 @@
               "ProcessReceiptLogGroup"
             ]
           },
-          "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY": {
+          "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ProcessReceiptLambdaFunction"
               },
-              "CodeSha256": "RlyO24CbCUM1r9+sWGHfmC+2mkslwX+l4RmheqCJnRU="
+              "CodeSha256": "CdJI6bTZFJrw3hsbnct2T10DAjeQxz15qZW11a5qr9k="
             }
           },
           "ProcessReceiptCustomS31": {
@@ -190,13 +190,10 @@
               "BucketName": "km-expense-tracker-receipts",
               "BucketConfigs": [
                 {
-                  "Event": "s3:ObjectCreated:*",
+                  "Event": "s3:ObjectCreated:Put",
                   "Rules": [
                     {
                       "Prefix": "uploads/"
-                    },
-                    {
-                      "Suffix": ".png"
                     }
                   ]
                 }
@@ -321,7 +318,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-                "S3Key": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z/custom-resources.zip"
+                "S3Key": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z/custom-resources.zip"
               },
               "FunctionName": "process-receipt-service-dev-custom-resource-existing-s3",
               "Handler": "s3/handler.handler",
@@ -357,7 +354,7 @@
           "ProcessReceiptLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY"
+              "Ref": "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog"
             },
             "Export": {
               "Name": "sls-process-receipt-service-dev-ProcessReceiptLambdaFunctionQualifiedArn"
@@ -377,14 +374,11 @@
           {
             "s3": {
               "bucket": "km-expense-tracker-receipts",
-              "event": "s3:ObjectCreated:*",
+              "event": "s3:ObjectCreated:Put",
               "existing": true,
               "rules": [
                 {
                   "prefix": "uploads/"
-                },
-                {
-                  "suffix": ".png"
                 }
               ]
             }
@@ -400,7 +394,7 @@
         "memory": 512,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "ProcessReceiptLambdaVersiongTC6DCmkzOLYtBqjtmGNl2O1Lzu9j9jodWewAKutCY"
+        "versionLogicalId": "ProcessReceiptLambdaVersionruV9tUFGDqR3JQAIGUh4jG17ehnQAwE84Qshx4dog"
       }
     },
     "configValidationMode": "warn",
@@ -449,7 +443,7 @@
         "individually": "truexz",
         "artifactsS3KeyDirname": "serverless/process-receipt-service/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-east-1-34bed064-1ad4",
-        "artifactDirectoryName": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z"
+        "artifactDirectoryName": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z"
       }
     },
     "appId": null,
@@ -461,7 +455,7 @@
   },
   "package": {
     "individually": "truexz",
-    "artifactDirectoryName": "serverless/process-receipt-service/dev/1749590919324-2025-06-10T21:28:39.324Z",
+    "artifactDirectoryName": "serverless/process-receipt-service/dev/1753412588124-2025-07-25T03:03:08.124Z",
     "artifact": ""
   }
 }
